@@ -7,4 +7,4 @@ for i in range(1,n+1):
             isPrime=False
             break
     if isPrime:
-        print(i,end=" ")    
+        print(i,end=" ")
