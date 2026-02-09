@@ -1,0 +1,5 @@
+student_questions = eval(input("Student questions (student: [q_ids]): "))
+all_questions = set().union(*student_questions.values()) if student_questions else set()
+attempted_by_all = set(student_questions[next(iter(student_questions))]).intersection(*student_questions.values()) if student_questions else set()
+print(f"Total unique questions: {len(all_questions)}")
+print(f"Questions attempted by all: {attempted_by_all if attempted_by_all else 'None'}")

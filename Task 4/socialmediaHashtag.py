@@ -1,0 +1,5 @@
+posts = eval(input("Posts (list of lists): "))
+all_hashtags = set().union(*posts) if posts else set()
+common_hashtags = set(posts[0]).intersection(*posts[1:]) if len(posts) > 1 else (set(posts[0]) if posts else set())
+print(f"All unique hashtags: {all_hashtags}")
+print(f"In every post: {common_hashtags if common_hashtags else 'None'}")
