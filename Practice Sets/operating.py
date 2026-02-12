@@ -1,0 +1,11 @@
+import os
+print(os.name)
+print(os.getcwd())
+print(os.listdir())
+print(os.path.join('folder', 'file.txt'))
+print(os.path.exists('file.txt'))
+print(os.path.isfile('file.txt'))
+print(os.path.isdir('folder'))
+print(os.path.abspath('file.txt'))
+print(os.path.basename('/path/to/file.txt'))
+print(os.path.dirname('/path/to/file.txt'))

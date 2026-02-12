@@ -1,0 +1,10 @@
+import datetime 
+now = datetime.datetime.now()
+print(datetime.date.today())
+print(now.year)
+print(now.month)
+print(now.day)
+print(now.hour)
+print(now.minute)
+print(now.second)
+print(now.microsecond)
