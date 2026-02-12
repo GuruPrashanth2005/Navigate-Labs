@@ -1,0 +1,12 @@
+import sys
+print(sys.version)
+print(sys.platform)
+print(sys.argv)
+print(sys.path)
+print(sys.maxsize)
+print(sys.getsizeof(0))
+print(sys.getrecursionlimit())
+print(sys.getdefaultencoding())
+print(sys.getfilesystemencoding())
+print(sys.getrefcount(0))
+print(sys.exit())
