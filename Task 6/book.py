@@ -1,8 +1,7 @@
 class Book:
     def __init__(self, title, price):
         self.title = title
-        self.__price = price   # private variable
-
+        self.__price = price
     def update_price(self, new_price):
         if new_price > 0:
             self.__price = new_price
