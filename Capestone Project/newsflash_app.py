@@ -37,18 +37,22 @@ def fetch_rss(url, max_items=10):
     articles = []
     try:
         r = requests.get(url, headers=HEADERS, timeout=12)
-        soup = BeautifulSoup(r.content, "xml")
-        for item in soup.find_all("item")[:max_items]:
-            title = clean_text(item.find("title").text if item.find("title") else "")
-            link  = item.find("link").text.strip() if item.find("link") else "#"
+        # Use html.parser instead of xml — no lxml needed!
+        soup = BeautifulSoup(r.content, "html.parser")
+        items = soup.find_all("item")[:max_items]
+        for item in items:
+            title_tag = item.find("title")
+            link_tag  = item.find("link")
+            title  = clean_text(title_tag.get_text() if title_tag else "")
+            link   = link_tag.get_text().strip() if link_tag else "#"
             summary = ""
             for tag in ["description", "summary"]:
                 node = item.find(tag)
-                if node and node.text.strip():
-                    summary = clean_text(node.text)
+                if node and node.get_text().strip():
+                    summary = clean_text(node.get_text())
                     break
-            date_node = item.find("pubDate") or item.find("published")
-            date = date_node.text.strip()[:25] if date_node else ""
+            date_node = item.find("pubdate") or item.find("published")
+            date = date_node.get_text().strip()[:25] if date_node else ""
             if title:
                 articles.append({"title": title, "link": link, "summary": summary, "date": date})
     except Exception:
@@ -76,7 +80,6 @@ with st.sidebar:
 
     st.divider()
     st.button("🔄 Refresh Headlines", use_container_width=True)
-
     st.divider()
     st.caption(f"🕐 {datetime.datetime.now().strftime('%d %b %Y, %H:%M')}")
     st.caption("Sources: BBC RSS Feeds")
@@ -91,7 +94,7 @@ source_counts = {}
 
 with st.spinner("📡 Fetching live headlines…"):
     for src_name in selected_sources:
-        src = NEWS_SOURCES[src_name]
+        src  = NEWS_SOURCES[src_name]
         arts = fetch_rss(src["url"], max_items=max_per_source)
         for a in arts:
             a["source"]   = src_name
@@ -112,7 +115,6 @@ m1.metric("📄 Total Headlines", len(filtered))
 m2.metric("📡 Sources Active",  len(selected_sources))
 m3.metric("🗂️ Categories",     len(set(a["category"] for a in filtered)))
 m4.metric("🕐 Last Updated",   datetime.datetime.now().strftime("%H:%M"))
-
 st.divider()
 
 if not filtered:
@@ -121,9 +123,8 @@ if not filtered:
 
 # ── Top Story ─────────────────────────────────────────────────────────────────
 st.subheader("⭐ Top Story")
-
+top = filtered[0]
 with st.container(border=True):
-    top = filtered[0]
     st.markdown(f"### [{top['title']}]({top['link']})")
     if top["summary"]:
         st.write(top["summary"])
@@ -136,8 +137,7 @@ st.divider()
 
 # ── Category Tabs ─────────────────────────────────────────────────────────────
 categories = sorted(set(a["category"] for a in filtered))
-tab_labels = ["📋 All"] + categories
-tabs = st.tabs(tab_labels)
+tabs = st.tabs(["📋 All"] + categories)
 
 def render_articles(articles):
     if not articles:
@@ -150,16 +150,8 @@ def render_articles(articles):
                 with st.container(border=True):
                     st.markdown(f"**[{article['title']}]({article['link']})**")
                     if article["summary"]:
-                        st.caption(
-                            article["summary"][:150] + "…"
-                            if len(article["summary"]) > 150
-                            else article["summary"]
-                        )
-                    st.caption(
-                        f"📰 {article['source']}  ·  "
-                        f"🏷️ {article['category']}  ·  "
-                        f"🕐 {article['date'][:20] if article['date'] else 'Recent'}"
-                    )
+                        st.caption(article["summary"][:150] + "…" if len(article["summary"]) > 150 else article["summary"])
+                    st.caption(f"📰 {article['source']}  ·  🏷️ {article['category']}  ·  🕐 {article['date'][:20] if article['date'] else 'Recent'}")
                     st.link_button("Read →", article["link"], use_container_width=True)
 
 with tabs[0]:
